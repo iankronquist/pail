@@ -1,0 +1,15 @@
+{
+  "name": "iankronquist-puppetpail",
+  "version": "0.1.0",
+  "author": "iankronquist",
+  "summary": "A grand experiment and practice writing puppet code",
+  "license": "MIT",
+  "source": "puppetpail",
+  "project_page": "github repo goes here",
+  "issues_url": "github issues go here",
+  "dependencies": [
+    {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"}
+  ],
+  "data_provider": null
+}
+
