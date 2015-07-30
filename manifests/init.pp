@@ -1,7 +1,7 @@
-# Class: puppetpail
+# Class: pail
 # ===========================
 #
-# Full description of class puppetpail here.
+# Full description of class pail here.
 #
 # Parameters
 # ----------
@@ -28,7 +28,7 @@
 # --------
 #
 # @example
-#    class { 'puppetpail':
+#    class { 'pail':
 #      servers => [ 'pool.ntp.org', 'ntp.local.company.com' ],
 #    }
 #
@@ -42,7 +42,9 @@
 #
 # Copyright 2015 Your name here, unless otherwise noted.
 #
-class puppetpail {
-
-
+class pail(String $container_name) {
+  package { 'debootstrap':
+    ensure  => present,
+  }
+  class { '::create_container': }
 }

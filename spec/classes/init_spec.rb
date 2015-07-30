@@ -1,7 +1,7 @@
 require 'spec_helper'
-describe 'puppetpail' do
+describe 'pail' do
 
   context 'with defaults for all parameters' do
-    it { should contain_class('puppetpail') }
+    it { should contain_class('pail') }
   end
 end

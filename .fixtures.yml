@@ -4,4 +4,4 @@ fixtures:
       repo: 'git://github.com/puppetlabs/puppetlabs-stdlib.git'
       ref: '4.1.0'
   symlinks:
-    puppetpail: "#{source_dir}"
+    pail: "#{source_dir}"
