@@ -1,0 +1,1 @@
+{"virtualbox":{"/home/vagrant/project":{"guestpath":"/home/vagrant/project","hostpath":"/Users/iankronquist/gg/puppetpail","disabled":false},"/vagrant":{"guestpath":"/vagrant","hostpath":"/Users/iankronquist/gg/puppetpail/node","disabled":false}}}
