@@ -42,9 +42,14 @@
 #
 # Copyright 2015 Your name here, unless otherwise noted.
 #
-class pail(String $container_name) {
+class pail (
+$container_name='test',
+$puppet_conf='/etc/puppet/puppet.conf',
+$suite='squeeze',
+$system='http://http.debian.net/debian/',
+) {
   package { 'debootstrap':
     ensure  => present,
   }
-  class { '::create_container': }
+  class { 'pail::create_container': }
 }
