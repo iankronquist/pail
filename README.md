@@ -26,10 +26,17 @@ Here's an example to place in `site.pp`
 ```puppet
 node 'node.vm' {
         class { 'pail':
-                container_name => '/foo',
-                puppet_conf => 'puppet.conf.erb',
-                suite => 'squeeze', # The debian flavor to create, like sid
-                system => 'http://http.debian.net/debian/'
+                container_name='test', # The machine name of the container
+                root_path='/test', # The fully qualified path to where the
+                # filesystem will be unpacked. This will be created with
+                # debootstrap if it doesn't exist
+                puppet_conf='/etc/puppet/puppet.conf', # A template for the
+                # puppet.conf file
+                suite='squeeze', # The debian version to include, like sid or
+                # unstable
+                system='http://http.debian.net/debian/', # Where to download
+                # the packages from
+) {
         }
 }
 ```
