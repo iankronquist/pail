@@ -44,6 +44,7 @@
 #
 class pail (
 $container_name='test',
+$root_path='/test',
 $puppet_conf='/etc/puppet/puppet.conf',
 $suite='squeeze',
 $system='http://http.debian.net/debian/',

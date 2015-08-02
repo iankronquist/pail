@@ -1,21 +1,36 @@
 class pail::create_container {
-  # Create container directory structure
-  exec { "/usr/sbin/debootstrap $pail::suite $pail::container_name $pail::system":
-    creates => $pail::container_name
+  # Create container directory structure with debootstrap.
+  # This may take a while
+  exec { "/usr/sbin/debootstrap $pail::suite $pail::root_path $pail::system":
+    creates => $pail::root_path,
+    timeout     => 1800,
   }
-  file { "$pail::container_name/puppet.conf":
-    path => '/usr/bin',
+  # Copy over the specified puppet.conf, defaulting to the puppet.conf on the
+  # master
+  file { "$pail::root_path/etc/puppet/puppet.conf":
     ensure => file,
     content => template($pail::puppet_conf),
     # notify => container_puppet
   }
-  # Bootstrap node
-  exec { "systemd-nspawn -D $pail::container_name 'apt-get install puppet'":
+  # Bootstrap node.
+  exec { "systemd-nspawn -M $pail::container_name -M $pail::root_path 'apt-get install puppet'":
     path => '/usr/bin',
-    onlyif => "systemd-nspawn -D $pail::container_name 'dpkg -s puppet'"
+    onlyif => "systemd-nspawn -M $pail::root_path 'dpkg -s puppet'"
   }
-  exec { "systemd-nspawn -D $pail::container_name 'systemctl start puppet'":
+  # Install Puppet
+  exec { "systemd-nspawn -M $pail::container_name 'apt-get install puppet'":
     path => '/usr/bin',
-    onlyif => "systemd-nspawn -D $pail::container_name 'systemctl status puppet'"
+    onlyif => "systemd-nspawn -M $pail::container_name 'dpkg -s puppet'"
+  }
+  # Start the Puppet service
+  exec { "systemd-nspawn -M $pail::container_name 'systemctl start puppet'":
+    path => '/usr/bin',
+    onlyif => "systemd-nspawn -M $pail::container_name 'systemctl status puppet'"
+  }
+
+  # Trigger the first Puppet run to generate certificates.
+  exec { "systemd-nspawn -M $pail::container_name 'sudo puppet agent -t'":
+    path => '/usr/bin',
+    onlyif => "systemd-nspawn -M $pail::container_name 'systemctl status puppet'"
   }
 }
