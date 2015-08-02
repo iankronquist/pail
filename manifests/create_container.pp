@@ -5,23 +5,38 @@ class pail::create_container {
     creates => $pail::root_path,
     timeout     => 1800,
   }
-  # Copy over the specified puppet.conf, defaulting to the puppet.conf on the
-  # master
-  file { "$pail::root_path/etc/puppet/puppet.conf":
-    ensure => file,
-    content => template($pail::puppet_conf),
-    # notify => container_puppet
+
+  # Touch the os-release file so a container can be brought up.
+  file { "$pail::root_path/etc/os-release":
+    ensure => 'present',
   }
   # Bootstrap node.
   exec { "systemd-nspawn -M $pail::container_name -M $pail::root_path 'apt-get install puppet'":
     path => '/usr/bin',
     onlyif => "systemd-nspawn -M $pail::root_path 'dpkg -s puppet'"
   }
+
   # Install Puppet
   exec { "systemd-nspawn -M $pail::container_name 'apt-get install puppet'":
     path => '/usr/bin',
     onlyif => "systemd-nspawn -M $pail::container_name 'dpkg -s puppet'"
   }
+
+  # Copy over the specified puppet.conf, defaulting to the puppet.conf on the
+  # master
+
+  # Oh for mkdir -p
+  file { ["$pail::root_path/etc/",
+          "$pail::root_path/etc/puppet/"]:
+    ensure => directory,
+  }
+
+  file { "$pail::root_path/etc/puppet/puppet.conf":
+    ensure => file,
+    content => template($pail::puppet_conf),
+    # notify => container_puppet
+  }
+
   # Start the Puppet service
   exec { "systemd-nspawn -M $pail::container_name 'systemctl start puppet'":
     path => '/usr/bin',
