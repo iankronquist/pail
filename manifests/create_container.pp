@@ -10,10 +10,12 @@ class pail::create_container {
   file { "$pail::root_path/etc/os-release":
     ensure => 'present',
   }
+
   # Bootstrap node.
-  exec { "systemd-nspawn -M $pail::container_name -M $pail::root_path 'apt-get install puppet'":
+  exec { "systemd-nspawn -M $pail::container_name -D $pail::root_path":
     path => '/usr/bin',
-    onlyif => "systemd-nspawn -M $pail::root_path 'dpkg -s puppet'"
+    # only if the container is not already running
+    onlyif => "/bin/machinectl status $pail::container_name; test $? -ne 0"
   }
 
   # Install Puppet
