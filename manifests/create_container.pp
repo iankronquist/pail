@@ -1,26 +1,25 @@
 class pail::create_container {
-  # Create container directory structure with debootstrap.
-  # This may take a while
-  exec { "/usr/sbin/debootstrap $pail::suite $pail::root_path $pail::system":
-    creates => $pail::root_path,
-    timeout     => 1800,
+  # FIXME: split into dependencies installation module
+  package { "lxc":
+    ensure => present
+  }
+  package { "lxc-templates":
+    ensure => present
   }
 
-  # Touch the os-release file so a container can be brought up.
-  file { "$pail::root_path/etc/os-release":
-    ensure => 'present',
+  exec { "lxc-create -n $pail::name -t $pail::template":
+    creates => "/var/lib/lxx/$pail::name/",
   }
 
   # Bootstrap node.
-  exec { "systemd-nspawn -M $pail::container_name -D $pail::root_path":
+  exec { "lxc-start -n $pail::name":
     path => '/usr/bin',
     # only if the container is not already running
     onlyif => "/bin/machinectl status $pail::container_name; test $? -ne 0"
   }
 
   # Install Puppet
-  exec { "systemd-nspawn -M $pail::container_name 'apt-get install puppet'":
-    path => '/usr/bin',
+  exec { "lxc-execute -n $pail::name 'curl https://spencerkrum.com/install_puppet.sh | bash'":
     onlyif => "systemd-nspawn -M $pail::container_name 'dpkg -s puppet'"
   }
 
@@ -28,11 +27,13 @@ class pail::create_container {
   # master
 
   # Oh for mkdir -p
+  # FIXME: install with puppet apply
   file { ["$pail::root_path/etc/",
           "$pail::root_path/etc/puppet/"]:
     ensure => directory,
   }
 
+  # FIXME: install with puppet apply
   file { "$pail::root_path/etc/puppet/puppet.conf":
     ensure => file,
     content => template($pail::puppet_conf),
@@ -40,14 +41,15 @@ class pail::create_container {
   }
 
   # Start the Puppet service
-  exec { "systemd-nspawn -M $pail::container_name 'systemctl start puppet'":
-    path => '/usr/bin',
+  # FIXME: install with puppet apply
+  # FIXME: fix only ifs
+  exec { "lxc-execute -n $pail::name 'systemctl start puppet'":
     onlyif => "systemd-nspawn -M $pail::container_name 'systemctl status puppet'"
   }
 
   # Trigger the first Puppet run to generate certificates.
-  exec { "systemd-nspawn -M $pail::container_name 'sudo puppet agent -t'":
-    path => '/usr/bin',
+  # FIXME: fix only ifs
+  exec { "lxc-execute -n $pail::name 'sudo puppet agent -t'":
     onlyif => "systemd-nspawn -M $pail::container_name 'systemctl status puppet'"
   }
 }
