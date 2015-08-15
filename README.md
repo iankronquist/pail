@@ -1,23 +1,18 @@
 # Pail - Manage containers like nodes
 
-Pail uses `debootstrap` and `systemd` to create and manage containers as puppet
-nodes on Debian 8 systems.
+Pail uses `lxc` to create and manage containers as puppet nodes.
 
 
-Pail creates a base system using `debootstrap` and
+Pail creates a base system using `lxc-create` and
 then starts the container and installs Puppet on the system. It enables the
 systemd Puppet unit and installs the specified `puppet.conf`. It then sends a
 certificate signing request to the master. The resulting container will appear
 to the master like any other Puppet node.
 
-Please note that containers brought up with `systemd-nspawn` may not be
-suitable for fully secure container setups. This is a proof of concept.
-
 
 ### What pail affects
 
-* Pail installs `debootstrap`.
-* Pail creates a directory tree at the specified location.
+* Pail installs `lxc` and `lxc-templates`.
 * Pail spins up and bootstraps a container.
 
 ### Beginning with pail
