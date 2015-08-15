@@ -43,14 +43,15 @@
 # Copyright 2015 Your name here, unless otherwise noted.
 #
 class pail (
-$container_name='test',
-$root_path='/test',
+$name='test',
 $puppet_conf='/etc/puppet/puppet.conf',
-$suite='squeeze',
-$system='http://http.debian.net/debian/',
+$template='centos',
 ) {
-  package { 'debootstrap':
+  package { 'lxc':
     ensure  => present,
+  }
+  package { 'lxc-templates':
+	ensure  => present,
   }
   class { 'pail::create_container': }
 }
